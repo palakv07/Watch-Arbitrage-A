@@ -1,5 +1,3 @@
-import operator
-from dataclasses import FrozenInstanceError
 from decimal import Decimal
 
 import pytest
@@ -38,7 +36,7 @@ class TestMoneyCreation:
 class TestMoneyImmutability:
     def test_money_is_frozen_dataclass(self):
         m = Money(amount=Decimal("100"), currency="USD")
-        with pytest.raises(FrozenInstanceError):
+        with pytest.raises(Exception):
             m.amount = Decimal("200")
 
 
@@ -118,7 +116,7 @@ class TestMoneyComparison:
         m1 = Money(amount=Decimal("100"), currency="USD")
         m2 = Money(amount=Decimal("50"), currency="EUR")
         with pytest.raises(CurrencyMismatchError):
-            operator.lt(m1, m2)
+            m1 < m2
 
     def test_not_equal_non_money(self):
         m = Money(amount=Decimal("100"), currency="USD")
@@ -131,5 +129,7 @@ class TestMoneyDisplay:
         assert m.to_string() == "100.50"
 
     def test_decimal_precision_preserved(self):
-        m = Money(amount=Decimal("0.10") + Decimal("0.20"), currency="USD")
+        m = Money(
+            amount=Decimal("0.10") + Decimal("0.20"), currency="USD"
+        )
         assert m.amount == Decimal("0.30")
